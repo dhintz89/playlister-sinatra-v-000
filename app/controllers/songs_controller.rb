@@ -37,8 +37,10 @@ class SongsController < ApplicationController
   patch "/songs/:slug" do 
     @song = Song.find_by_slug(params[:slug])
     @song.artist = Artist.find_or_create_by(name: params[:artist_name])
-    if @song.genres.is_empty?
-      @song.genres = params[:genres]
+    if !@song.genres.is_empty?
+      @song.genres = []
+    end
+    params[:genres].each {|genre_id| @song.genres << Genre.find_by_id(genre_id)}
     @song.save
     flash[:message] = "Successfully updated song."
     redirect "songs/#{@song.slug}"
